@@ -1,3 +1,4 @@
 dataset/
 people/
-__pychache__/
+__pycache__/
+.idea/
