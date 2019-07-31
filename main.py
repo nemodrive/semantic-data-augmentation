@@ -1,5 +1,4 @@
 import os
-from person import crop_all_people
 from road import overlay_people_on_road
 # import imageio
 # import imgaug as ia
@@ -9,9 +8,8 @@ import random
 import pandas as pd
 
 
-PERSON_PATH = 'people/person1_monchengladbach_019500.png'
-ROAD_PATH = 'dataset/nemodrive/cityscapes/out_images/18nov_8c00f08fd4914269-0_55-frame.png'
-SEGMENTED_ROAD_PATH = 'dataset/nemodrive/cityscapes/out_images/18nov_8c00f08fd4914269-0_55.png'
+CITYSCAPE_PATH = "dataset/cityscapes/"
+DATA_PATH_FILE = "dataset/cityscapes/train_fine.txt"
 
 
 # def augment_image_test():
@@ -22,23 +20,26 @@ SEGMENTED_ROAD_PATH = 'dataset/nemodrive/cityscapes/out_images/18nov_8c00f08fd49
 #     ia.imshow(image_aug)
 
 
-if __name__ == '__main__':
-    # overlay_people_on_road(PERSON_PATH, ROAD_PATH, SEGMENTED_ROAD_PATH)
-    # crop_all_people()
-
-    data_paths_file = "dataset/cityscapes/train_fine.txt"
+def overlay_all_road_images_with_people():
+    data_paths_file = DATA_PATH_FILE
     df = pd.read_csv(data_paths_file, sep='\t', header=None)
-    df[0] = "dataset/cityscapes/" + df[0]
-    df[1] = "dataset/cityscapes/" + df[1]
-    df[2] = df[1].apply(lambda x: x.replace("_trainIds", ""))
+    df[0] = CITYSCAPE_PATH + df[0]
+    df[1] = CITYSCAPE_PATH + df[1]
 
     people = glob.glob("people/*.png")
 
     while True:
         idxp = random.randint(0, len(people))
         idxr = random.randint(0, len(df))
-        print(people[idxp], df.loc[idxr][0], df.loc[idxr][2])
-        overlay_people_on_road(people[idxp], df.loc[idxr][0], df.loc[idxr][2])
+        print(people[idxp], df.loc[idxr][0], df.loc[idxr][1])
+        overlay_people_on_road(people[idxp], df.loc[idxr][0], df.loc[idxr][1])
+
+
+if __name__ == '__main__':
+    overlay_all_road_images_with_people()
+
+
+
 
 
 

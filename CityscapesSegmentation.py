@@ -1,32 +1,77 @@
-import os
-from tqdm import tqdm
-from PIL import Image
-import numpy as np
-import torch
-import torch.utils.data as data
-import re
-from utils.cityscapes import CityscapesSegmentation
+###########################################################################
+# Created by: CASIA IVA
+# Email: jliu@nlpr.ia.ac.cn
+# Copyright (c) 2018
+###########################################################################
 
-class Augm(data.Dataset):
+import os
+import numpy as np
+from PIL import Image
+
+import torch
+import re
+from tqdm import tqdm
+from BaseDataset import BaseDataset
+
+
+class CityscapesSegmentation(BaseDataset):
     BASE_DIR = 'cityscapes'
     NUM_CLASS = 19
 
-    def __init__(self, people_file, road_dataset):
-        self.road_dataset = road_dataset
+    def __init__(self, root='../datasets', split='train',
+                 mode=None, transform=None, target_transform=None, **kwargs):
+        super(CityscapesSegmentation, self).__init__(
+            root, split, mode, transform, target_transform, **kwargs)
+        # assert exists
+        root = os.path.join(root, self.BASE_DIR)
+
+        assert os.path.exists(root), "Please download the dataset!!"
+
+        self.images, self.masks = _get_cityscapes_pairs(root, split)
+        if split != 'vis':
+            assert (len(self.images) == len(self.masks))
+        if len(self.images) == 0:
+            raise (RuntimeError("Found 0 images in subfolders of: \
+                " + root + "\n"))
 
     def __getitem__(self, index):
-        img, mask = self.road_dataset[index]
+        img = Image.open(self.images[index]).convert('RGB')
+        if self.mode == 'vis':
+            if self.transform is not None:
+                img = self.transform(img)
+            return img, os.path.basename(self.images[index])
 
-        # TODO
+        mask = Image.open(self.masks[index])
+
+        # synchrosized transform
+        if self.mode == 'train':
+            img, mask = self._sync_transform(img, mask)
+        elif self.mode == 'val':
+            img, mask = self._val_sync_transform(img, mask)
+        else:
+            assert self.mode == 'testval'
+            mask = self._mask_transform(mask)
+
+        # general resize, normalize and toTensor
+        if self.transform is not None:
+            img = self.transform(img)
+        if self.target_transform is not None:
+            mask = self.target_transform(mask)
+
         return img, mask
 
+    def _mask_transform(self, mask):
+        target = np.array(mask).astype('int32')
+        target[target == 255] = -1
+        return torch.from_numpy(target).long()
+
     def __len__(self):
-        return len(self.road_dataset)
+        return len(self.images)
 
-nemodrive_road = CityscapesSegmentation()
-nemodrive_aug = Augm("path", nemodrive_road)
+    @property
+    def pred_offset(self):
+        return 0
 
-img, mask = test[0]
 
 def _get_cityscapes_pairs(folder, split='train'):
     def get_path_pairs(folder, split_f):
