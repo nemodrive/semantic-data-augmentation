@@ -2,4 +2,3 @@ dataset/
 people/
 __pycache__/
 .idea/
-!*.gitignore
