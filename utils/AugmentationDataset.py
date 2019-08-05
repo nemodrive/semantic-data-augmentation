@@ -1,5 +1,5 @@
 import torch.utils.data as data
-from road import overlay_people_on_road
+from roadpackage.road import overlay_people_on_road
 import numpy as np
 from PIL import Image
 import cv2
