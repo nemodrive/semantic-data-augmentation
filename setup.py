@@ -7,7 +7,7 @@ setup(
     author='Dragos Homner',
     author_email='dragoshomner@yahoo.com',
     # Needed to actually package something
-    packages=['road-package'],
+    packages=['roadpackage'],
     # Needed for dependencies
     install_requires=['numpy'],
     # *strongly* suggested for sharing
