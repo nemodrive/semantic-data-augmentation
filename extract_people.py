@@ -17,6 +17,11 @@ counter_files = 0
 
 
 def crop_all_people(people_link_file: str) -> None:
+    """
+    :param people_link_file: a two column file with original cityscape image path and segmented
+                            cityscape image path
+    :return:
+    """
 
     file_path_people = open("people_path.txt", "w")
     file_path_people.write("")
@@ -42,13 +47,14 @@ def crop_all_people(people_link_file: str) -> None:
     #         extract_people_from_cityscape(segmented_image, original_image[0])
 
 
-def extract_people_from_cityscape(segmented_image: str, original_image: str)-> np.ndarray:
+def extract_people_from_cityscape(segmented_image: str, original_image: str)-> None:
     """
-    :param segmented_image: ipsum lorem
-    :param original_image:
+    :param segmented_image: segmented image path
+    :param original_image: original image path
     :return:
     """
 
+    # used to counter images and write in file name
     global counter_files
 
     # Read segmented image
@@ -96,11 +102,6 @@ def extract_people_from_cityscape(segmented_image: str, original_image: str)-> n
             # Remove background and make it transparent
             res = cv2.cvtColor(res, cv2.COLOR_BGR2BGRA)
             res[np.all(res == [0, 0, 0, 255], axis=2)] = [0, 0, 0, 0]
-
-            # Show cropped man
-            # cv2.imshow("Show Boxes", res)
-            # cv2.waitKey(0)
-            # cv2.destroyAllWindows()
 
             # Create new PNG file with the person cropped
             image_name = "person" + str(i) + "_" + \

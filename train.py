@@ -2,6 +2,9 @@ import torch
 import torchvision.transforms as transform
 from utils.AugmentationDataset import AugmentationDataset
 from CityscapesSegmentation import CityscapesSegmentation
+import cv2
+import random
+import numpy as np
 
 from option import Options
 
@@ -23,8 +26,15 @@ class Trainer():
 
         trainset = CityscapesSegmentation('dataset', split='train', mode='train',
                                             **data_kwargs)
-        trainset = AugmentationDataset('people_path.txt', trainset)
+        # trainset = AugmentationDataset('people_path.txt', trainset)
 
+        while True:
+            index = random.randint(0, len(trainset))
+
+            img = np.array(trainset[index][0])
+            cv2.imshow('image', img)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
 
         # testset = get_segmentation_dataset(args.dataset, split='val', mode='val',
         #                                    **data_kwargs)

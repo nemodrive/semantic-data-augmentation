@@ -12,6 +12,9 @@ import torch
 import re
 from tqdm import tqdm
 from BaseDataset import BaseDataset
+from utils.AugmentationDataset import AugmentationDataset
+from road import overlay_people_on_road
+import cv2
 
 
 class CityscapesSegmentation(BaseDataset):
@@ -36,6 +39,7 @@ class CityscapesSegmentation(BaseDataset):
 
     def __getitem__(self, index):
         img = Image.open(self.images[index]).convert('RGB')
+
         if self.mode == 'vis':
             if self.transform is not None:
                 img = self.transform(img)
@@ -43,11 +47,17 @@ class CityscapesSegmentation(BaseDataset):
 
         mask = Image.open(self.masks[index])
 
+        # overlay people on road
+        img = overlay_people_on_road('people_path.txt', np.array(img), np.array(mask))
+        img = Image.fromarray(img, 'RGB')
+
         # synchrosized transform
         if self.mode == 'train':
             img, mask = self._sync_transform(img, mask)
         elif self.mode == 'val':
             img, mask = self._val_sync_transform(img, mask)
+        elif self.mode == 'none':
+            pass
         else:
             assert self.mode == 'testval'
             mask = self._mask_transform(mask)

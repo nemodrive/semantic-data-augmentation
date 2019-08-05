@@ -6,8 +6,8 @@ import random
 from random import randrange
 import numpy as np
 
-ALPHA = 1.35
-BETA = -250
+ALPHA = 1.29
+BETA = -0.61
 PERSON_HEIGHT = 150
 ELLIPSE_HEIGHT = 20
 SEGMENTED_ROAD_COLOR = 0
@@ -17,12 +17,25 @@ SEGMENTED_PERSON_COLOR = [0, 0, 0, 255]
 def overlay_people_on_road(person_path: str, road: np.ndarray, segmented_road: np.ndarray) \
         -> np.ndarray:
 
-    # get cropped person from PERSON_PATH
+    """
+    :param person_path: one column file with all people paths
+    :param road: a np.ndarray image with the original road image
+    :param segmented_road: a np.ndarray image with the segmented road image
+    :return: a np.ndarray image with the overlaid road with people
+    """
+
+    # get a random cropped person from PERSON_PATH
     df = pd.read_csv(person_path, sep='\n', header=None)
     idxp = random.randint(0, len(df[0]))
 
+    # read people image (s_img = people_image)
     s_img = cv2.imread(df[0][idxp], -1)
+    s_img = cv2.cvtColor(s_img, cv2.COLOR_BGRA2RGBA)
+
+    # copy road image (l_img = road_image)
     l_img = road
+
+    # copy segmented image of the road(segmented_img = segmented_road_image)
     segmented_img = segmented_road
 
     # get original road image from ROAD_PATH
@@ -32,7 +45,7 @@ def overlay_people_on_road(person_path: str, road: np.ndarray, segmented_road: n
     # segmented_img = cv2.imread(segmented_road, -1)
 
     # get the placement point of person on road
-    x2, y2 = find_position_on_road(segmented_img)
+    x2, y2, road_height = find_position_on_road(l_img, segmented_img)
 
     # if it is not any road in the image, return the original image without augmentation
     if x2 == y2 == -1:
@@ -41,7 +54,10 @@ def overlay_people_on_road(person_path: str, road: np.ndarray, segmented_road: n
     # set the new coordinates of person in the road image (where he will be placed)
     # y_offset = y_offset - s_img.shape[0]
 
-    person_h = person_height(y2)
+    # get the new person height using the position on the road
+    person_h = person_height(y2, l_img.shape[0], road_height)
+
+    # resize the person image using the new person height (person_h)
     s_img = resize_person(s_img, person_h)
 
     # calculate the coordinates of the person
@@ -65,13 +81,11 @@ def overlay_people_on_road(person_path: str, road: np.ndarray, segmented_road: n
     # alpha_s = s_img[:, :, 3] / 255.0
     # alpha_l = 1.0 - alpha_s
 
+    # overlay person on the road
     overlay_transparent(l_img, s_img, x1, y1)
 
     # Create the segmented image of person to overlay over segmented road
     # segmented_person = get_segmented_image_of_person(s_img)
-
-    # for c in range(0, 3):
-    #     segmented_img[y1:y2, x1:x2, c] = (alpha_s * segmented_person[:, :, c] + alpha_l * segmented_img[y1:y2, x1:x2, c])
 
     # Show the overlaid image
     # cv2.imshow('image', l_img)
@@ -84,10 +98,13 @@ def overlay_people_on_road(person_path: str, road: np.ndarray, segmented_road: n
     # Destroy all windows
     # cv2.destroyAllWindows()
 
+    # optional - change color from BGR to RGB (is used in CityscapesSegmentation)
+    l_img = cv2.cvtColor(l_img, cv2.COLOR_BGR2RGB)
+
     return l_img
 
 
-def resize_person(person_image, height: int)-> int:
+def resize_person(person_image: np.ndarray, height: int)-> np.ndarray:
 
     # resize the person image, having height equal to PERSON_HEIGHT
     new_height = height
@@ -97,17 +114,22 @@ def resize_person(person_image, height: int)-> int:
     # x1 = x1 + person_image.shape[1] - new_width
     # y1 = y1 + person_image.shape[0] - new_height
 
+    if new_height == 0 or new_width == 0:
+        return person_image
+
     # resize person_image
     person_image = cv2.resize(person_image, (new_width, new_height))
 
     return person_image
 
 
-def person_height(person_pos: int)-> int:
-    return int(0.4 * person_pos)
+def person_height(person_pos: int, image_height: int, road_height)-> int:
+    # return int(road_height + person_pos - image_height)
+    person_percent = ALPHA * person_pos / image_height + BETA
+    return int(person_percent * image_height)
 
 
-def linear_function(alpha: int, x: int, beta: int) -> int:
+def linear_function(alpha: int, x: float, beta: int) -> float:
     return alpha * x + beta
 
 
@@ -124,23 +146,29 @@ def draw_person_ellipse_position(image: np.ndarray, y: int) -> None:
                    1, (0, 0, 255), -1)
 
 
-def find_position_on_road(segmented_img):
+def find_position_on_road(image, segmented_img: np.ndarray) -> (int, int, int):
     road_points = []
+    road_height = 0
 
     for row in range(segmented_img.shape[0]):
         for column in range(segmented_img.shape[1]):
             if segmented_img[row][column] == SEGMENTED_ROAD_COLOR:
                 road_points.append([row, column])
+                road_height = max(road_height, segmented_img.shape[0] - row)
+                # Draw road
+                # cv2.circle(image,
+                #            (column, row),
+                #            1, (0, 0, 255), -1)
 
     if len(road_points) == 0:
-        return -1, -1
+        return -1, -1, 0
 
     idr = random.randrange(0, len(road_points))
 
-    return road_points[idr][1], road_points[idr][0]
+    return road_points[idr][1], road_points[idr][0], road_height
 
 
-def get_segmented_image_of_person(image):
+def get_segmented_image_of_person(image: np.ndarray) -> np.ndarray:
     segmented_person = image
     for row in range(image.shape[0]):
         for column in range(image.shape[1]):
@@ -149,7 +177,7 @@ def get_segmented_image_of_person(image):
     return segmented_person
 
 
-def overlay_transparent(background, overlay, x, y):
+def overlay_transparent(background: np.ndarray, overlay: np.ndarray, x: int, y: int) -> np.ndarray:
 
     background_width = background.shape[1]
     background_height = background.shape[0]
@@ -191,14 +219,13 @@ def overlay_transparent(background, overlay, x, y):
     overlay_image = overlay[..., :3]
     mask = overlay[..., 3:] / 255.0
 
-    print(h, w)
-
     background[y:y+h, x:x+w] = (1.0 - mask) * background[y:y+h, x:x+w] + mask * overlay_image
 
     return background
 
 
 if __name__ == '__main__':
-    overlay_people_on_road('people_path.txt',
-                           'dataset/cityscapes/out_images/18nov_0ef581bf4a424ef1-0_0-frame.png',
-                           'dataset/cityscapes/out_images/18nov_0ef581bf4a424ef1-0_trainIds_0.png')
+    road_i = cv2.imread('dataset/cityscapes/out_images/18nov_8c00f08fd4914269-0_88-frame.png', -1)
+    seg_road_i = cv2.imread('dataset/cityscapes/out_images/18nov_8c00f08fd4914269-0_trainIds_88.png'
+                            , -1)
+    overlay_people_on_road('people_path.txt', road_i, seg_road_i)
