@@ -1,5 +1,9 @@
 from setuptools import setup
 
+dependency_links=[
+	'git+https://github.com/nemodrive/semantic_data_augmentation#egg=roadpackage',
+]
+
 setup(
     # Needed to silence warnings (and to be a worthwhile package)
     name='Road',
