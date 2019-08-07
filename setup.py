@@ -12,7 +12,7 @@ setup(
     description="A small example package",
     long_description_content_type="text/markdown",
     url="https://github.com/pypa/sampleproject",
-    packages=['roadpackag'],
+    packages=['roadpackage'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
