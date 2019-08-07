@@ -1,8 +1,0 @@
-README.md
-setup.py
-roadpackage/__init__.py
-roadpackage/road.py
-roadpackage.egg-info/PKG-INFO
-roadpackage.egg-info/SOURCES.txt
-roadpackage.egg-info/dependency_links.txt
-roadpackage.egg-info/top_level.txt
