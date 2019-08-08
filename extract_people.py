@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import os
-import glob
 import argparse
 import pandas as pd
 
@@ -76,7 +75,7 @@ def extract_people_from_cityscape(segmented_image: str, original_image: str)-> N
         # Get a rectangle of contoured person
         rect = cv2.boundingRect(c)
         x, y, w, h = rect
-        box = cv2.rectangle(mask, (x, y), (x+w, y+h), (0, 0, 255), 2)
+        # box = cv2.rectangle(mask, (x, y), (x+w, y+h), (0, 0, 255), 2)
 
         # Get a cropped person including other people in background
         cropped = mask[y: y+h, x: x+w]

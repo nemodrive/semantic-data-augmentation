@@ -1,8 +1,6 @@
 from setuptools import setup
 
-dependency_links=[
-	'git+https://github.com/nemodrive/semantic_data_augmentation',
-]
+dependency_links = ['git+https://github.com/nemodrive/semantic_data_augmentation']
 
 setup(
     name="roadpackage",
