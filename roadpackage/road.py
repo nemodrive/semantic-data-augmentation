@@ -26,7 +26,7 @@ def overlay_people_on_road(person_path: str, road: np.ndarray, segmented_road: n
 
     # get a random cropped person from PERSON_PATH
     df = pd.read_csv(person_path, sep='\n', header=None)
-    idxp = random.randint(0, len(df[0]))
+    idxp = random.randint(0, len(df[0]) - 1)
 
     # read people image (s_img = people_image)
     s_img = cv2.imread(df[0][idxp], -1)
