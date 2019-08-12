@@ -19,7 +19,7 @@ class Trainer():
 
         # dataset
         data_kwargs = {'transform': None, 'base_size': 640,
-                       'crop_size': 256, 'scale': None,
+                       'crop_size': 640, 'scale': None,
                        'logger': None}
         # trainset = get_segmentation_dataset(args.dataset, split='train', mode='train',
         #                                     **data_kwargs)
@@ -28,13 +28,14 @@ class Trainer():
                                             **data_kwargs)
         # trainset = AugmentationDataset('people_path.txt', trainset)
 
-        while True:
-            index = random.randint(0, len(trainset))
+        print(len(trainset))
 
+        for index in range(len(trainset) - 1):
+            print(index)
             img = np.array(trainset[index][0])
             cv2.imshow('image', img)
             cv2.waitKey(0)
-            cv2.destroyAllWindows()
+
 
         # testset = get_segmentation_dataset(args.dataset, split='val', mode='val',
         #                                    **data_kwargs)

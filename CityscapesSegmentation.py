@@ -17,6 +17,7 @@ from roadpackage.road import overlay_people_on_road
 import cv2
 
 
+
 class CityscapesSegmentation(BaseDataset):
     BASE_DIR = 'cityscapes'
     NUM_CLASS = 19
