@@ -3,7 +3,6 @@ import os
 import pandas as pd
 import math
 import random
-from random import randrange
 import numpy as np
 
 ALPHA = 1.29
@@ -26,7 +25,7 @@ def overlay_people_on_road(person_path: str, road: np.ndarray, segmented_road: n
 
     # get a random cropped person from PERSON_PATH
     df = pd.read_csv(person_path, sep='\n', header=None)
-    idxp = random.randrange(0, len(df[0]))
+    idxp = random.randrange(0, len(df[0]) - 1)
 
     # read people image (s_img = people_image)
     s_img = cv2.imread(df[0][idxp], -1)
@@ -104,7 +103,7 @@ def overlay_people_on_road(person_path: str, road: np.ndarray, segmented_road: n
     return l_img
 
 
-def resize_person(person_image: np.ndarray, height: int)-> np.ndarray:
+def resize_person(person_image: np.ndarray, height: int) -> np.ndarray:
 
     # resize the person image, having height equal to PERSON_HEIGHT
     new_height = height
@@ -123,7 +122,7 @@ def resize_person(person_image: np.ndarray, height: int)-> np.ndarray:
     return person_image
 
 
-def person_height(person_pos: int, image_height: int, road_height)-> int:
+def person_height(person_pos: int, image_height: int, road_height) -> int:
     # return int(road_height + person_pos - image_height)
     person_percent = ALPHA * person_pos / image_height + BETA
     return int(person_percent * image_height)
