@@ -33,18 +33,6 @@ def crop_all_people(people_link_file: str) -> None:
     for index in range(len(df)):
         extract_people_from_cityscape(df[1][index], df[0][index])
 
-    # for cities in glob.glob(PATH_TO_SEGMENTED_CITIES):
-    #     path_to_original_images = PATH_TO_ORIGINAL_IMAGES + cities.split('/')[4]
-    #     path_to_segmented_images = cities + "/*color.png"
-    #
-    #     for segmented_image in glob.glob(path_to_segmented_images):
-    #         path_original_image = path_to_original_images + '/*' + \
-    #                               segmented_image.split('_')[2] + '_' +\
-    #                               segmented_image.split('_')[3] + \
-    #                               '*.png'
-    #         original_image = glob.glob(path_original_image)
-    #         extract_people_from_cityscape(segmented_image, original_image[0])
-
 
 def extract_people_from_cityscape(segmented_image: str, original_image: str)-> None:
     """
