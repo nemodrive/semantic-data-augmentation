@@ -4,3 +4,10 @@ __pycache__/
 .idea/
 build/
 dist/
+BaseDataset.py
+CityscapesSegmentation.py
+main.py
+option.py
+train.py
+train_fine.txt
+val_fine.txt
