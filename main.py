@@ -1,26 +1,17 @@
-import torch
-import torchvision
 from torchvision import datasets, transforms
-import cityscapes_downloader
+import cityscapes
 
 
 def main():
-    csd = cityscapes_downloader.CityscapesDownloader(
+    train_set = cityscapes.Cityscapes(
         root='./resources/datasets/cityscapes/',
-        login={'user': 'amilab', 'pass': 'amilab@aimas'},
-        packages=['gtFine', 'gtCoarse', 'leftImg8bit']
-    )
-
-    csd.download()
-
-    # TODO: Remove this after testing
-    train_set = datasets.Cityscapes(
-        root='./resources/datasets/cityscapes/',
+        login=['amilab', 'amilab@aimas'],
         split='train',
         mode='fine',
         transform=transforms.Compose([
             transforms.ToTensor()
-        ])
+        ]),
+        download=False
     )
 
     return
