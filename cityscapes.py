@@ -18,7 +18,7 @@ class Cityscapes(VisionDataset):
         'vehicle': '10',
         'vehicle-extra': '11',
         'leftImg8bit-demo': '12',
-        'gtBbox-cityPersons': '28'
+        'gtBboxCityPersons': '28'
     }
 
     CityscapesClass = datasets.Cityscapes.CityscapesClass
