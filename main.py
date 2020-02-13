@@ -24,14 +24,23 @@ def main():
     #     if d['label'] == 'person':
     #         count += 1
     # print(count)
-    csse = CSSemanticExtractor([[1, 1], [1,1]], 'person')
+    csse = CSSemanticExtractor(1000)
 
-    total_count = 0
-    for image, target in train_set:
-        count = csse.get_target_count(target)
-        print('Count: ', count)
-        total_count += count
-    print(total_count)
+    stats = csse(train_set, all_instances=True, show_progress=True)
+    print(stats)
+
+    # total_target_count = 0
+    # image_count = 0
+    # total_image_count = float(len(train_set))
+    # for image, target in train_set:
+    #     count = csse._get_target_class_count(target, 'person', all=True)
+    #     total_target_count += count
+    #     image_count += 1.0
+    #     print('Processed images: %.2f%% \r' % (image_count/total_image_count*100), end="")
+    #
+    #
+    #
+    # print('\nTotal count:', total_target_count)
 
     # fig = plt.figure(figsize=[20, 5])
     # fig.add_subplot(1, 2, 1)
