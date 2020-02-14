@@ -3,11 +3,9 @@ import subprocess
 import glob
 import zipfile
 from torchvision import datasets
-from torchvision.datasets.vision import VisionDataset
 
 
-class Cityscapes(VisionDataset):
-    # TODO: see the exact naming of archive folders from https://www.cityscapes-dataset.com/
+class Cityscapes:
     CityscapesPackages = {
         'gtFine': '1',
         'gtCoarse': '2',
@@ -23,10 +21,8 @@ class Cityscapes(VisionDataset):
 
     CityscapesClass = datasets.Cityscapes.CityscapesClass
     classes = datasets.Cityscapes.classes
-
-    def __init__(self, root, login, packages=('gtFine', 'gtCoarse', 'leftImg8bit'),
-                 split='train', mode='fine', target_type='instance',
-                 transform=None, target_transform=None, transforms=None, download=False):
+    def __init__(self, root, login, packages=('gtFine', 'gtCoarse', 'leftImg8bit'), split='train', mode='fine',
+                 target_type='instance', transform=None, target_transform=None, transforms=None, download=False):
 
         self.root = root
 
@@ -43,7 +39,6 @@ class Cityscapes(VisionDataset):
         self.obj_wrapper = datasets.Cityscapes(root, split, mode, target_type,
                                                transform, target_transform, transforms)
 
-        # TODO: check to see if needed in wrapper, temporary added for now
         # Pytorch class parameters
         self.mode = mode
         self.target_type = target_type
@@ -64,7 +59,6 @@ class Cityscapes(VisionDataset):
         # r = session.post('https://www.cityscapes-dataset.com/login/', data=login)
         # r = session.get('https://www.cityscapes-dataset.com/file-handling/?packageID=1')
         # print(r.request.url)
-        #
         # session.close()
 
         subprocess.check_call([
