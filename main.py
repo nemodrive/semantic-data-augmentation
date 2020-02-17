@@ -3,30 +3,16 @@ import cityscapes
 import matplotlib.pyplot as plt
 import numpy as np
 from cs_sematic_extractor import CSSemanticExtractor
+import json
 
 
 def main():
-    csse = CSSemanticExtractor('./resources/datasets/semanticsets', 10000)
+    csse = CSSemanticExtractor('./resources/datasets/semanticsets', 5, 'person')
 
-    train_set = cityscapes.Cityscapes(
-        root='./resources/datasets/cityscapes/',
-        login=['none', 'none'],
-        split='train',
-        mode='fine',
-        target_type=['semantic', 'polygon'],
-        transform=transforms.Compose([
-            transforms.ToTensor()
-        ]),
-        download=True
-    )
-
-    stats = csse(train_set, all_instances=True, show_progress=True)
-    print(stats)
-
-    # valid_set = cityscapes.Cityscapes(
+    # train_set = cityscapes.Cityscapes(
     #     root='./resources/datasets/cityscapes/',
     #     login=['none', 'none'],
-    #     split='val',
+    #     split='train',
     #     mode='fine',
     #     target_type=['semantic', 'polygon'],
     #     transform=transforms.Compose([
@@ -34,13 +20,26 @@ def main():
     #     ]),
     #     download=True
     # )
-    #
-    # stats = csse(valid_set, all_instances=False, show_progress=True)
-    # print(stats)
+    # stats = csse(train_set, all_instances=False, show_progress=True)
+    # print('\n', json.dumps(stats, indent=2))
+
+    valid_set = cityscapes.Cityscapes(
+        root='./resources/datasets/cityscapes/',
+        login=['none', 'none'],
+        split='val',
+        mode='fine',
+        target_type=['semantic', 'polygon'],
+        transform=transforms.Compose([
+            transforms.ToTensor()
+        ]),
+        download=True
+    )
+    stats = csse(valid_set, all_instances=False, show_progress=True)
+    print('\n', json.dumps(stats, indent=2))
 
     # TODO: remove this when done
 
-    image, target = train_set[3]
+    # image, target = train_set[3]
     # count = 0
     # for d in target[1]['objects']:
     #     if d['label'] == 'person':
