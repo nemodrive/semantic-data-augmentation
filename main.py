@@ -7,7 +7,7 @@ import json
 
 
 def main():
-    csse = CSSemanticExtractor('./resources/datasets/semanticsets', 5, 'person')
+    csse = CSSemanticExtractor('./resources/datasets/semanticsets', 7, 'person')
 
     # train_set = cityscapes.Cityscapes(
     #     root='./resources/datasets/cityscapes/',

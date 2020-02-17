@@ -76,19 +76,26 @@ class CSSemanticExtractor:
                             '.json'
                         image_save_idx += 1
 
+                        instance_width = int((bbox[1] - bbox[0])[0])
+                        instance_height = int((bbox[1] - bbox[0])[1])
+                        destination_polygon = np.array(t['polygon']) - np.array(bbox[0])
+
+
                         instance = {
                             'source': dataset.obj_wrapper.images[idx],
+                            'sourceBBox': bbox.tolist(),
+                            'sourcePolygon': t['polygon'],
                             'destination': target_image_path,
-                            'imageHeight': int((bbox[1] - bbox[0])[1]),
-                            'imageWidth': int((bbox[1] - bbox[0])[0]),
+                            'destinationBBox': [[0, 0], [instance_width, instance_height]],
+                            'destinationPolygon': destination_polygon.tolist(),
+                            'imageHeight': instance_height,
+                            'imageWidth': instance_width,
                             'label': t['label'],
-                            'bbox': bbox.tolist(),
-                            'bboxArea': int(area),
-                            'polygon': t['polygon']
+                            'bboxArea': int(area)
                         }
 
                         cropped_image = semantic_image_crop(image, bbox,
-                                                            instance['polygon'],
+                                                            instance['sourcePolygon'],
                                                             instance['imageHeight'],
                                                             instance['imageWidth'])
 
@@ -112,12 +119,12 @@ class CSSemanticExtractor:
         self.stats[self.target_class]['instancesCount'] += 1
         if instance['bboxArea'] > self.stats[self.target_class]['maxBBoxArea']:
             self.stats[self.target_class]['maxBBoxArea'] = instance['bboxArea']
-            self.stats[self.target_class]['maxBBox'] = instance['bbox']
+            self.stats[self.target_class]['maxBBox'] = instance['destinationBBox']
             self.stats[self.target_class]['maxBBoxHeight'] = instance['imageHeight']
             self.stats[self.target_class]['maxBBoxWidth'] = instance['imageWidth']
         if instance['bboxArea'] < self.stats[self.target_class]['minBBoxArea']:
             self.stats[self.target_class]['minBBoxArea'] = instance['bboxArea']
-            self.stats[self.target_class]['minBBox'] = instance['bbox']
+            self.stats[self.target_class]['minBBox'] = instance['destinationBBox']
             self.stats[self.target_class]['minBBoxHeight'] = instance['imageHeight']
             self.stats[self.target_class]['minBBoxWidth'] = instance['imageWidth']
 
