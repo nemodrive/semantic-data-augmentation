@@ -8,7 +8,8 @@ import torchvision
 
 
 class CSSemanticExtractor:
-    def __init__(self, root, bbox_area_threshold=5.0, target_class='person'):
+    def __init__(self, root, bbox_area_threshold=5.0, target_class='person', annotation_prefix='',
+                 annotation_numbering=4):
         self.root = root
         if not os.path.exists(self.root):
             os.makedirs(self.root)
@@ -18,6 +19,9 @@ class CSSemanticExtractor:
         if bbox_area_threshold > 100.0:
             bbox_area_threshold = 0
         self.bbox_area_threshold = bbox_area_threshold
+
+        self.annotation_prefix = annotation_prefix
+        self.annotation_numbering = '/%.{}d'.format(annotation_numbering)
 
         self.target_class = target_class
         self.stats = dict()
@@ -61,9 +65,15 @@ class CSSemanticExtractor:
 
                     if all_instances or (area >= bbox_area_threshold):
                         # Create destination image
-                        # TODO: Add configurable numbering scheme
-                        target_image_path = target_class_dir + '/%.6d' % image_save_idx + '.png'
-                        target_annotation_path = target_class_dir + '/%.6d' % image_save_idx + '.json'
+                        target_image_path = target_class_dir + \
+                                            self.annotation_prefix + \
+                                            self.annotation_numbering % image_save_idx +\
+                                            '.png'
+                        target_annotation_path = \
+                            target_class_dir + \
+                            self.annotation_prefix + \
+                            self.annotation_numbering % image_save_idx + \
+                            '.json'
                         image_save_idx += 1
 
                         instance = {
